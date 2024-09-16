@@ -1,0 +1,144 @@
+/** @format */
+
+console.log("Products frontend javascript file");
+
+$(function () {
+   $(".product-collection").on("change", () => {
+      const selectedValue = $(".product-collection").val();
+      if (selectedValue === "KIDS") {
+         $("#product-volume").show();
+         $("#product-collection").hide();
+      } else {
+         $("#product-collection").show();
+         $("#product-volume").hide();
+      }
+   });
+
+   $("#process-btn").on("click", () => {
+      $(".dish-container").slideToggle(500);
+      $(".process-btn").css("display", "none");
+   });
+
+   $("#cancel-btn").on("click", () => {
+      $(".dish-container").slideToggle(100);
+      $(".process-btn").css("display", "flex");
+   });
+
+   $(".new-product-status").on("change", async function (e) {
+      const id = e.target.id;
+      const productStatus = $(`#${id}.new-product-status`).val();
+      if (productStatus === "DAILYDEALS") {
+         try {
+            const response = await axios.post(`/admin/product/daily/${id}`, {
+               status: productStatus,
+            });
+            if (response.data.success) {
+               alert(response.data.message);
+               window.location.replace("/admin/product/daily");
+            } else {
+               alert(response.data.message);
+            }
+
+            console.log("Daily product has been uploaded");
+            const result = response.data;
+
+            if (result) {
+               $(".new-product-status").blur();
+            } else alert("Daily product update failed");
+         } catch (err) {
+            console.log("Error on daily product uploading");
+         }
+      } else {
+         const id = e.target.id;
+         const productStatus = $(`#${id}.new-product-status`).val();
+         try {
+            const response = await axios.post(`/admin/product/update/${id}`, {
+               productStatus: productStatus,
+            });
+            console.log("response", response);
+            const result = response.data;
+            if (response.data) {
+               $(".new-product-status").blur();
+            } else alert("Product update failed");
+         } catch (err) {
+            console.log(err);
+            alert("Product update failed");
+         }
+      }
+   });
+});
+
+$(function () {
+   $(".sale-btn").on("click", async function (e) {
+      e.preventDefault();
+
+      const productId = e.target.id;
+      console.log("Product ID:", productId);
+      const value = $(this).closest("td").find(".sale-input").val();
+      if (value.trim() === "") {
+         alert("Please enter valid number");
+         return false;
+      }
+
+      axios
+         .post(`/admin/product/discount/${productId}`, {
+            discount: value,
+         })
+         .then(function (response) {
+            if (response.data) {
+               alert("Confirm To Apply Discount Price !");
+               window.location.replace("/admin/product/all");
+            } else {
+               alert("Failed to apply discount");
+            }
+         })
+         .catch(function (err) {
+            console.error(err);
+            alert("Error applying discount");
+         });
+   });
+});
+
+function validateForm() {
+   const productName = $(".product-name").val();
+   const productPrice = $(".product-price").val();
+   const productLeftCount = $(".product-left-count").val();
+   const productCollection = $(".product-collection").val();
+   const productDesc = $(".product-desc").val();
+   const productStatus = $(".product-status").val();
+
+   if (
+      productName === "" ||
+      productPrice === "" ||
+      productLeftCount === "" ||
+      productCollection === "" ||
+      productDesc === "" ||
+      productStatus === ""
+   ) {
+      alert("Please insert all details !");
+      return false;
+   } else {
+      return true;
+   }
+}
+
+// Function to handle file preview
+function previewFileHandler(input, order) {
+   const imageClassName = input.className;
+   console.log("input", input);
+
+   const file = $(`.${imageClassName}`).get(0).files[0];
+   const filetype = file["type"];
+   const validImageType = ["image/jpeg", "image/jpg", "image/png"];
+   if (!validImageType.includes(filetype)) {
+      alert("Please insert only jpeg, jpg, and png");
+   } else {
+      if (file) {
+         const reader = new FileReader();
+         reader.onload = function () {
+            $(`#image-section-${order}`).attr("src", reader.result);
+         };
+         reader.readAsDataURL(file);
+      }
+   }
+}

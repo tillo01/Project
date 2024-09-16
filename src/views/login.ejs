@@ -1,0 +1,76 @@
+<!-- @format -->
+
+<%- include('includes/header') %>
+
+<link
+   rel="stylesheet"
+   type="text/css"
+   href="/css/login.css" />
+<link
+   rel="stylesheet"
+   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+<body>
+   <form
+      class="login-container"
+      action="/admin/login"
+      METHOD="POST">
+      <div class="login-frame">
+         <div class="login-top">
+            <span>Enter</span>
+            <div>
+               Go back
+               <a
+                  href="/admin"
+                  style="color: #6440fb"
+                  >Home</a
+               >
+            </div>
+            <p>
+               Not registered yet?
+               <a
+                  href="/admin/signup"
+                  style="color: #6440fb"
+                  >Signup</a
+               >
+            </p>
+         </div>
+         <div class="login-input-frame">
+            <div class="login-input-container">
+               <label>Restaurant *</label>
+               <input
+                  type="text"
+                  name="memberNick"
+                  class="member-nick"
+                  placeholder="Username"
+                  value=""
+                  required />
+            </div>
+            <div class="login-input-container">
+               <label>Password *</label>
+               <input
+                  type="password"
+                  name="memberPassword"
+                  class="member-password"
+                  placeholder="Password"
+                  value=""
+                  required />
+               <span
+                  id="toggle-password"
+                  class="eye-icon">
+                  <i class="fa fa-eye get-icon"></i>
+               </span>
+            </div>
+         </div>
+         <button
+            style="background-color: rgb(197, 54, 82)"
+            class="login-btn btn"
+            name="login"
+            type="submit">
+            Login
+         </button>
+      </div>
+   </form>
+</body>
+
+<%- include('includes/footer') %>
