@@ -122,6 +122,18 @@ function validateForm() {
    }
 }
 
+$("#descArea").on("input", function () {
+   const productDesc = $(".product-desc").val();
+   const maxWord = 15;
+   const letters = productDesc.match(/[a-zA-Z]/g) || [];
+   if (letters.length > maxWord) {
+      alert("You can`t enter more than 15 letter");
+      let alphaOnlyDesc = productDesc.replace(/[^a-zA-Z]/g, "");
+      const trimmedAlphaText = alphaOnlyDesc.slice(0, maxChars);
+      $(this).val(trimmedAlphaText);
+   }
+});
+
 // Function to handle file preview
 function previewFileHandler(input, order) {
    const imageClassName = input.className;
