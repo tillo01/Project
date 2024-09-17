@@ -2,7 +2,6 @@
 
 import { HttpCode } from "../libs/types/Errors";
 import {
-   Discounted,
    Product,
    ProductInput,
    ProductInquery,
@@ -135,7 +134,7 @@ class ProductService {
    public async applyDiscount(
       productId: string,
       discount: number,
-   ): Promise<Discounted> {
+   ): Promise<Product> {
       try {
          productId = shapeIntoMongooseObjectId(productId);
 

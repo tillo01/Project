@@ -44,7 +44,7 @@ const productSchema = new Schema(
       productSize: {
          type: String,
          enum: ProductSize,
-         default: ProductSize.L,
+         default: ProductSize.XL,
       },
 
       productKids: {

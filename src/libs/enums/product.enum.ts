@@ -5,7 +5,7 @@ export enum ProductSize {
    S = "S",
    L = "L",
    XL = "XL",
-   XXL = "SET",
+   XXL = "XXL",
 }
 // Product Volume
 export enum ProductKids {

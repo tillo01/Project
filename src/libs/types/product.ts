@@ -16,6 +16,8 @@ export interface Product {
    productLeftCount: number;
    productSize: ProductSize;
    productVolume: number;
+   productDiscount: number;
+   productIsDicounted?: number;
    productDesc?: string;
    productImages: string[];
    productViews: number;
@@ -55,10 +57,6 @@ export interface ProductUpdateInput {
    productDesc?: string;
    productImages?: string[];
    productViews?: number;
-}
-
-export interface Discounted {
-   productPrice: number;
    productDiscount?: number;
    productIsDicounted?: number;
 }
