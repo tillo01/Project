@@ -21,6 +21,8 @@ export interface Product {
    productDesc?: string;
    productImages: string[];
    productViews: number;
+   productExpiryDate: number;
+
    createdAt: Date;
    updatedAt: Date;
 }
@@ -59,4 +61,5 @@ export interface ProductUpdateInput {
    productViews?: number;
    productDiscount?: number;
    productIsDicounted?: number;
+   productExpiryDate: null;
 }

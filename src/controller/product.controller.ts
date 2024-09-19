@@ -137,11 +137,11 @@ productController.uploadToDaily = async (req: Request, res: Response) => {
 
    try {
       const { id } = req.params;
-
-      const result = await productService.uploadToDaily(id);
-      res.status(HttpCode.OK).json({ data: result });
+      const { expiryDate } = req.body;
+      const result = await productService.uploadToDaily(id, expiryDate);
+      res.status(HttpCode.OK).json(result);
    } catch (err) {
-      console.log("Error on discountEnter");
+      console.log("Error on uploadToDailyDeals");
       if (err instanceof Errors) res.status(err.code).json(err);
       else res.status(Errors.standard.code).json(Errors.standard);
    }

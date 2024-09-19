@@ -30,19 +30,18 @@ $(function () {
       if (productStatus === "DAILYDEALS") {
          try {
             const response = await axios.post(`/admin/product/daily/${id}`, {
-               status: productStatus,
+               productStatus: productStatus,
             });
-            if (response.data.success) {
-               alert(response.data.message);
-               window.location.replace("/admin/product/daily");
+            if (response) {
+               // window.location.replace("/admin/product/daily");
             } else {
-               alert(response.data.message);
+               alert("Failed uploaded to DailyDeals");
             }
 
             console.log("Daily product has been uploaded");
             const result = response.data;
 
-            if (result) {
+            if (response.data) {
                $(".new-product-status").blur();
             } else alert("Daily product update failed");
          } catch (err) {
@@ -65,6 +64,35 @@ $(function () {
             alert("Product update failed");
          }
       }
+   });
+});
+
+$(function () {
+   $(".daily-btn").on("click", async function (e) {
+      e.preventDefault();
+      const productId = e.target.id;
+      console.log("ProductId ID", productId);
+      const value = $(this).closest("td").find(".daily-input").val();
+      if (value.trim() === "") {
+         alert("Please enter valid number");
+         return false;
+      }
+      axios
+         .post(`/admin/product/daily/${productId}`, {
+            expiryDate: value,
+         })
+         .then(function (response) {
+            if (response.data) {
+               alert("Confirm To Apply DailyDeals !");
+               window.location.replace("/admin/product/all");
+            } else {
+               alert("Failed to apply DailyDeals");
+            }
+         })
+         .catch(function (err) {
+            console.error(err);
+            alert("Error applying discount");
+         });
    });
 });
 

@@ -17,7 +17,7 @@ import { ObjectId } from "mongoose";
 import ViewService from "./View.service";
 import { ViewInput } from "../libs/types/view";
 import { ViewGroup } from "../libs/enums/view.enum";
-import { OrderUpdateInput } from "../libs/types/order";
+import { CronJob } from "cron";
 
 class ProductService {
    private readonly productModel;
@@ -170,13 +170,44 @@ class ProductService {
       }
    }
 
-   public async uploadToDaily(id: string): Promise<Product> {
+   public async startDailyDeals(input: ProductUpdateInput) {
+      const time = new CronJob("* * * * *", async () => {
+         const now = new Date();
+         const expireddProduct = await this.productModel.updateMany(
+            {
+               productExpiryDate: { $lt: now },
+               productStatus: ProductStatus.DAILYDEALS,
+            },
+            { $set: { productStatus: ProductStatus.EXPIRED } },
+
+            null,
+         );
+      });
+      time.start();
+   }
+
+   public async uploadToDaily(
+      id: string,
+      expiryDate: number,
+   ): Promise<Product> {
       try {
          id = shapeIntoMongooseObjectId(id);
+         const date = new Date();
+         date.setHours(date.getHours() + expiryDate);
 
-         const result = await this.productModel.findOne({
+         const productStatus = await this.productModel.findOne({
             productStatus: ProductStatus.DAILYDEALS,
          });
+         const result = await this.productModel.findByIdAndUpdate(
+            id,
+            {
+               productStatus: ProductStatus.DAILYDEALS,
+               productExpiryDate: date,
+            },
+            {
+               new: true,
+            },
+         );
 
          return result;
       } catch (err) {

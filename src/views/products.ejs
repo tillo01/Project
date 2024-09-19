@@ -39,7 +39,9 @@
                   <th scope="col">Sale Price</th>
                   <th scope="col">Sold</th>
                   <th scope="col">Status</th>
-                  <th scope="col">Discount Enter</th>
+                  <th scope="col">Discount </th>
+                  <th scope="col">DailyDeals </th>
+
 
 
                 </tr>
@@ -76,7 +78,7 @@
                     <select class="spec-select new-product-status" id="<%= value._id %>">
                       <option value="PAUSE" <%= value.productStatus === 'PAUSE' ? 'selected' : '' %> >PAUSE</option>
                       <option value="PROCESS" <%= value.productStatus === 'PROCESS' ?'selected' : '' %> >PROCESS</option>
-                      <option value="DISCOUNT" <%= value.productStatus === 'DAILY' ? 'selected' : '' %> >Daily</option>
+                      <option value="DAILYDEALS" <%= value.productStatus === 'DAILYDEALS' ? 'selected' : '' %> >Daily</option>
                       <option value="DELETE" <%= value.productStatus === 'DELETE' ? 'selected' : '' %> >DELETE</option>
                     </select>
                   </td>
@@ -84,6 +86,14 @@
                     <span>
                           <input type="text"  class="sale-input" placeholder="Sale"  required/>
                         <button id="<%= value._id %>" type="submit" class="sale-btn">Apply </button>
+                      
+                    </span>
+                  </td>
+
+                  <td>
+                    <span>
+                          <input type="text"  class="daily-input" placeholder="DailyDeals"  required/>
+                        <button id="<%= value._id %>" type="submit" class="daily-btn">Ok </button>
                       
                     </span>
                   </td>

@@ -64,6 +64,10 @@ const productSchema = new Schema(
          type: Number,
          default: 0,
       },
+      productExpiryDate: {
+         type: Date,
+         default: null,
+      },
    },
    { timestamps: true }, // updatedAt, createdAt
 );
