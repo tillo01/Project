@@ -32,7 +32,17 @@ export interface ProductInquery {
    page: number;
    limit: number;
    productCollection?: ProductCollection;
+   productStatus?: ProductStatus;
    search?: string;
+}
+export interface ProductInqueryDaily {
+   order?: string;
+   page: number;
+   limit: number;
+   productCollection?: ProductCollection;
+   productStatus?: ProductStatus;
+   search?: string;
+   productExpiryDate: Date;
 }
 export interface ProductInput {
    productStatus?: ProductStatus;
@@ -62,4 +72,5 @@ export interface ProductUpdateInput {
    productDiscount?: number;
    productIsDicounted?: number;
    productExpiryDate: null;
+   expiryDate: number;
 }

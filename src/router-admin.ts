@@ -43,10 +43,10 @@ routerAdmin.post(
       restaurantController.verifyRestaurant,
       productController.updateChoosenProduct,
    );
+routerAdmin.post("/product/daily/:id", productController.uploadToDaily);
 
 routerAdmin.post("/product/discount/:id", productController.applyDiscount);
 // to the Dily
-routerAdmin.post("/product/daily/:id", productController.uploadToDaily);
 
 /* user  */
 

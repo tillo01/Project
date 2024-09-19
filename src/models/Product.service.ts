@@ -5,6 +5,7 @@ import {
    Product,
    ProductInput,
    ProductInquery,
+   ProductInqueryDaily,
    ProductUpdateInput,
 } from "../libs/types/product";
 import ProductModel from "../schema/Product.model";
@@ -17,7 +18,7 @@ import { ObjectId } from "mongoose";
 import ViewService from "./View.service";
 import { ViewInput } from "../libs/types/view";
 import { ViewGroup } from "../libs/enums/view.enum";
-import { CronJob } from "cron";
+import { addHours, format } from "date-fns";
 
 class ProductService {
    private readonly productModel;
@@ -32,8 +33,13 @@ class ProductService {
    public async getProducts(inquiry: ProductInquery): Promise<Product[]> {
       console.log("inquiry", inquiry);
       const match: T = { productStatus: ProductStatus.PROCESS };
+
       if (inquiry.productCollection)
          match.productCollection = inquiry.productCollection;
+      if (inquiry.productStatus) {
+         match.productStatus = inquiry.productStatus;
+      }
+
       if (inquiry.search) {
          match.productName = { $regex: new RegExp(inquiry.search, "i") };
       }
@@ -48,6 +54,31 @@ class ProductService {
          .aggregate([
             { $match: match },
             { $sort: sort },
+            { $skip: (inquiry.page * 1 - 1) * inquiry.limit },
+            { $limit: inquiry.limit * 1 },
+         ])
+
+         .exec();
+      if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+      return result;
+   }
+
+   public async getProductsDaily(
+      inquiry: ProductInqueryDaily,
+   ): Promise<Product[]> {
+      console.log("inquiry", inquiry);
+      const match: T = { productStatus: ProductStatus.DAILYDEALS };
+
+      if (inquiry.productCollection)
+         match.productCollection = inquiry.productCollection;
+
+      if (inquiry.search) {
+         match.productName = { $regex: new RegExp(inquiry.search, "i") };
+      }
+
+      const result = this.productModel
+         .aggregate([
+            { $match: match },
             { $skip: (inquiry.page * 1 - 1) * inquiry.limit },
             { $limit: inquiry.limit * 1 },
          ])
@@ -170,43 +201,22 @@ class ProductService {
       }
    }
 
-   public async startDailyDeals(input: ProductUpdateInput) {
-      const time = new CronJob("* * * * *", async () => {
-         const now = new Date();
-         const expireddProduct = await this.productModel.updateMany(
-            {
-               productExpiryDate: { $lt: now },
-               productStatus: ProductStatus.DAILYDEALS,
-            },
-            { $set: { productStatus: ProductStatus.EXPIRED } },
-
-            null,
-         );
-      });
-      time.start();
-   }
-
    public async uploadToDaily(
       id: string,
-      expiryDate: number,
+      expiryHours: number,
    ): Promise<Product> {
       try {
          id = shapeIntoMongooseObjectId(id);
-         const date = new Date();
-         date.setHours(date.getHours() + expiryDate);
 
-         const productStatus = await this.productModel.findOne({
-            productStatus: ProductStatus.DAILYDEALS,
-         });
+         const expiryDate = addHours(new Date(), expiryHours);
+
          const result = await this.productModel.findByIdAndUpdate(
             id,
             {
+               productExpiryDate: expiryDate,
                productStatus: ProductStatus.DAILYDEALS,
-               productExpiryDate: date,
             },
-            {
-               new: true,
-            },
+            { new: true },
          );
 
          return result;
@@ -215,5 +225,4 @@ class ProductService {
       }
    }
 }
-
 export default ProductService;

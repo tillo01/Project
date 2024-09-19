@@ -20,7 +20,6 @@ export enum ProductStatus {
    PROCESS = "PROCESS",
    DELETE = "DELETE",
    DAILYDEALS = "DAILYDEALS",
-   EXPIRED = "EXPIRED",
 }
 // ProductCollection
 export enum ProductCollection {

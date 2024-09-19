@@ -7,6 +7,7 @@ import {
    ProductSize,
    ProductStatus,
 } from "../libs/enums/product.enum";
+import { format } from "date-fns";
 
 const productSchema = new Schema(
    {
@@ -66,7 +67,7 @@ const productSchema = new Schema(
       },
       productExpiryDate: {
          type: Date,
-         default: null,
+         default: () => format(new Date(), "yyyy-MM-dd"),
       },
    },
    { timestamps: true }, // updatedAt, createdAt

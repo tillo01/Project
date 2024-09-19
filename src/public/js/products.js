@@ -27,43 +27,40 @@ $(function () {
    $(".new-product-status").on("change", async function (e) {
       const id = e.target.id;
       const productStatus = $(`#${id}.new-product-status`).val();
-      if (productStatus === "DAILYDEALS") {
-         try {
-            const response = await axios.post(`/admin/product/daily/${id}`, {
-               productStatus: productStatus,
-            });
-            if (response) {
-               // window.location.replace("/admin/product/daily");
-            } else {
-               alert("Failed uploaded to DailyDeals");
-            }
+      try {
+         const response = await axios.post(`/admin/product/update/${id}`, {
+            productStatus: productStatus,
+         });
+         console.log("response", response);
+         const result = response.data;
+         if (response.data) {
+            $(".new-product-status").blur();
+         } else alert("Product update failed");
+      } catch (err) {
+         console.log(err);
+         alert("Product update failed");
+      }
+   });
 
-            console.log("Daily product has been uploaded");
-            const result = response.data;
-
-            if (response.data) {
-               $(".new-product-status").blur();
-            } else alert("Daily product update failed");
-         } catch (err) {
-            console.log("Error on daily product uploading");
-         }
-      } else {
+   $(function () {
+      $(".new-product-status").on("change", async function (e) {
          const id = e.target.id;
          const productStatus = $(`#${id}.new-product-status`).val();
-         try {
-            const response = await axios.post(`/admin/product/update/${id}`, {
-               productStatus: productStatus,
-            });
-            console.log("response", response);
-            const result = response.data;
-            if (response.data) {
-               $(".new-product-status").blur();
-            } else alert("Product update failed");
-         } catch (err) {
-            console.log(err);
-            alert("Product update failed");
+         if (productStatus === "DAILYDEALS") {
+            axios
+               .post(`/admin/product/daily/${id}`, {
+                  productStatus: productStatus,
+               })
+               .then(function (response) {
+                  if (response.data.result) {
+                     $(".new-product-status").blur();
+                  }
+               })
+               .catch((err) => {
+                  console.log("failed Daily", err);
+               });
          }
-      }
+      });
    });
 });
 
@@ -77,6 +74,7 @@ $(function () {
          alert("Please enter valid number");
          return false;
       }
+
       axios
          .post(`/admin/product/daily/${productId}`, {
             expiryDate: value,
