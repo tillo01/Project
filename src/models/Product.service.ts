@@ -5,7 +5,6 @@ import {
    Product,
    ProductInput,
    ProductInquery,
-   ProductInqueryDaily,
    ProductUpdateInput,
 } from "../libs/types/product";
 import ProductModel from "../schema/Product.model";
@@ -19,7 +18,6 @@ import ViewService from "./View.service";
 import { ViewInput } from "../libs/types/view";
 import { ViewGroup } from "../libs/enums/view.enum";
 import { addHours, format } from "date-fns";
-import { OrderUpdateInput } from "../libs/types/order";
 
 class ProductService {
    private readonly productModel;

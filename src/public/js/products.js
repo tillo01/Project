@@ -76,7 +76,7 @@ $(function () {
       }
 
       axios
-         .post(`/admin/product/update/${productId}`, {
+         .post(`/admin/product/daily/${productId}`, {
             expiryDate: value,
          })
          .then(function (response) {
