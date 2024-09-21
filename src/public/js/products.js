@@ -52,7 +52,7 @@ $(function () {
                   productStatus: productStatus,
                })
                .then(function (response) {
-                  if (response.data.result) {
+                  if (response.data) {
                      $(".new-product-status").blur();
                   }
                })
@@ -76,7 +76,7 @@ $(function () {
       }
 
       axios
-         .post(`/admin/product/daily/${productId}`, {
+         .post(`/admin/product/update/${productId}`, {
             expiryDate: value,
          })
          .then(function (response) {

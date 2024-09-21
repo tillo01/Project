@@ -8,6 +8,7 @@ import { ProductInput, ProductInquery } from "../libs/types/product";
 import { AdminRequest, ExtendedRequest } from "../libs/types/member";
 import { ProductCollection } from "../libs/enums/product.enum";
 import MemberService from "../models/Member.service";
+import { format } from "path";
 
 const productService = new ProductService();
 const productController: T = {};
@@ -137,8 +138,11 @@ productController.uploadToDaily = async (req: Request, res: Response) => {
 
    try {
       const { id } = req.params;
-      const { expiryDate } = req.body;
-      const result = await productService.uploadToDaily(id, expiryDate);
+      const { expiryDate, input } = req.body;
+      const result = await productService.uploadToDaily(id, expiryDate, input);
+      console.log("expiryHours", expiryDate);
+      console.log("input", input);
+
       return res.status(HttpCode.OK).json(result);
    } catch (err) {
       console.log("Error on uploadToDailyDeals");

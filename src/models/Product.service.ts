@@ -19,6 +19,7 @@ import ViewService from "./View.service";
 import { ViewInput } from "../libs/types/view";
 import { ViewGroup } from "../libs/enums/view.enum";
 import { addHours, format } from "date-fns";
+import { OrderUpdateInput } from "../libs/types/order";
 
 class ProductService {
    private readonly productModel;
@@ -28,11 +29,13 @@ class ProductService {
       this.viewService = new ViewService();
    }
 
-   /* SPA */
+   /* SPA START */
 
    public async getProducts(inquiry: ProductInquery): Promise<Product[]> {
       console.log("inquiry", inquiry);
-      const match: T = { productStatus: ProductStatus.PROCESS };
+      const match: T = {
+         productStatus: ProductStatus.PROCESS && ProductStatus.DAILYDEALS,
+      };
 
       if (inquiry.productCollection)
          match.productCollection = inquiry.productCollection;
@@ -63,32 +66,7 @@ class ProductService {
       return result;
    }
 
-   public async getProductsDaily(
-      inquiry: ProductInqueryDaily,
-   ): Promise<Product[]> {
-      console.log("inquiry", inquiry);
-      const match: T = { productStatus: ProductStatus.DAILYDEALS };
-
-      if (inquiry.productCollection)
-         match.productCollection = inquiry.productCollection;
-
-      if (inquiry.search) {
-         match.productName = { $regex: new RegExp(inquiry.search, "i") };
-      }
-
-      const result = this.productModel
-         .aggregate([
-            { $match: match },
-            { $skip: (inquiry.page * 1 - 1) * inquiry.limit },
-            { $limit: inquiry.limit * 1 },
-         ])
-
-         .exec();
-      if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
-      return result;
-   }
-
-   /* SPA */
+   /* SPA  END*/
    public async getAllProducts(): Promise<Product[]> {
       const result = await this.productModel.find().exec();
 
@@ -153,7 +131,11 @@ class ProductService {
       input: ProductUpdateInput,
    ): Promise<Product> {
       id = shapeIntoMongooseObjectId(id);
+      const product = await this.productModel.findById(id).exec();
+      if (!product)
+         throw new Errors(HttpCode.NOT_FOUND, Message.UPDATED_FAILED);
       const result = await this.productModel
+
          .findOneAndUpdate({ _id: id }, input, { new: true })
          .exec();
 
@@ -202,19 +184,20 @@ class ProductService {
    }
 
    public async uploadToDaily(
-      id: string,
+      _id: string,
       expiryHours: number,
+      input: ProductUpdateInput,
    ): Promise<Product> {
       try {
-         id = shapeIntoMongooseObjectId(id);
+         _id = shapeIntoMongooseObjectId(_id);
 
          const expiryDate = addHours(new Date(), expiryHours);
 
          const result = await this.productModel.findByIdAndUpdate(
-            id,
+            _id,
             {
+               input,
                productExpiryDate: expiryDate,
-               productStatus: ProductStatus.DAILYDEALS,
             },
             { new: true },
          );
