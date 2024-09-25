@@ -233,7 +233,7 @@ class ProductService {
    }
 
    private scheduleCouponCleanup(_id: string) {
-      const task = cron.schedule("*/1 * * * * *", async () => {
+      const task = cron.schedule("0 * * * * *", async () => {
          console.log("Running scheduled cleanup for expired products.");
 
          await this.checkExpiryDate(_id);
