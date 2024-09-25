@@ -38,9 +38,7 @@ routerAdmin.post(
    makeUploader("products").array("productImages", 5),
    productController.createNewProduct,
 ),
-   routerAdmin.post("/product/daily/:id", productController.uploadToDaily);
-
-routerAdmin.post("/product/discount/:id", productController.applyDiscount);
+   routerAdmin.post("/product/discount/:id", productController.applyDiscount);
 
 routerAdmin.post(
    "/product/update/:id",

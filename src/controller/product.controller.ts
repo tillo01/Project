@@ -133,22 +133,4 @@ productController.applyDiscount = async (req: Request, res: Response) => {
    }
 };
 
-productController.uploadToDaily = async (req: Request, res: Response) => {
-   console.log("uploadToDaily");
-
-   try {
-      const { id } = req.params;
-      const { expiryDate, input } = req.body;
-      const result = await productService.uploadToDaily(id, expiryDate, input);
-      console.log("expiryHours", expiryDate);
-      console.log("input", input);
-
-      return res.status(HttpCode.OK).json(result);
-   } catch (err) {
-      console.log("Error on uploadToDailyDeals");
-      if (err instanceof Errors) res.status(err.code).json(err);
-      else res.status(Errors.standard.code).json(Errors.standard);
-   }
-};
-
 export default productController;

@@ -17,8 +17,6 @@ import { ObjectId } from "mongoose";
 import ViewService from "./View.service";
 import { ViewInput } from "../libs/types/view";
 import { ViewGroup } from "../libs/enums/view.enum";
-import { addHours, isBefore } from "date-fns";
-import cron from "node-cron";
 
 class ProductService {
    private readonly productModel;
@@ -33,7 +31,7 @@ class ProductService {
    public async getProducts(inquiry: ProductInquery): Promise<Product[]> {
       console.log("inquiry", inquiry);
       const match: T = {
-         productStatus: ProductStatus.PROCESS && ProductStatus.DAILYDEALS,
+         productStatus: ProductStatus.PROCESS,
       };
 
       if (inquiry.productCollection)
@@ -180,70 +178,6 @@ class ProductService {
          console.error(error);
          throw new Errors(HttpCode.NOT_FOUND, Message.UPDATED_FAILED);
       }
-   }
-
-   public async uploadToDaily(
-      _id: string,
-      expiryHours: number,
-      input: ProductUpdateInput,
-   ): Promise<Product> {
-      try {
-         _id = shapeIntoMongooseObjectId(_id);
-
-         const expiryDate = addHours(new Date(), expiryHours);
-         console.log("date====>", expiryDate);
-
-         const result = await this.productModel.findByIdAndUpdate(
-            _id,
-            {
-               ...input,
-               productExpiryDate: expiryDate,
-            },
-            { new: true },
-         );
-
-         console.log("input", input);
-         this.deleteExpiredHours(_id);
-
-         return result;
-      } catch (err) {
-         throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATED_FAILED);
-      }
-   }
-
-   private async checkExpiryDate(_id: string): Promise<void> {
-      try {
-         _id = shapeIntoMongooseObjectId(_id);
-         const product = await this.productModel.findById(_id);
-
-         const currentDate = new Date();
-
-         if (
-            product.productExpiryDate &&
-            isBefore(new Date(product.productExpiryDate), currentDate)
-         ) {
-            await this.productModel.findByIdAndDelete(product).exec();
-         }
-      } catch (err) {
-         console.log("Error on checkExpiryDate", err);
-         throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATED_FAILED);
-      }
-   }
-
-   private deleteExpiredHours(_id: string) {
-      const task = cron.schedule("0 * * * * *", async () => {
-         console.log("Running scheduled cleanup for expired products.");
-
-         await this.checkExpiryDate(_id);
-
-         const product = await this.productModel.findById(_id);
-         if (!product) {
-            console.log(
-               `Product with ID: ${_id} has been deleted. Stopping cleanup.`,
-            );
-            task.stop();
-         }
-      });
    }
 }
 export default ProductService;

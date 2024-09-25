@@ -49,6 +49,9 @@
 .products-container .daily-input {
    width: 60px;
 }
+.products-container .daily-btn {
+   width: 60px;
+}
 .products-container .sale-btn {
    height: auto;
    width: auto;
