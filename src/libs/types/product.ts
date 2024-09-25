@@ -58,7 +58,7 @@ export interface ProductInput {
 }
 
 export interface ProductUpdateInput {
-   _di: ObjectId;
+   _id: ObjectId;
    productStatus?: ProductStatus;
    productCollection?: ProductCollection;
    productName?: string;

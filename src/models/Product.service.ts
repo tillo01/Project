@@ -17,7 +17,8 @@ import { ObjectId } from "mongoose";
 import ViewService from "./View.service";
 import { ViewInput } from "../libs/types/view";
 import { ViewGroup } from "../libs/enums/view.enum";
-import { addHours, format } from "date-fns";
+import { addHours, isBefore } from "date-fns";
+import cron from "node-cron";
 
 class ProductService {
    private readonly productModel;
@@ -190,20 +191,61 @@ class ProductService {
          _id = shapeIntoMongooseObjectId(_id);
 
          const expiryDate = addHours(new Date(), expiryHours);
+         console.log("date====>", expiryDate);
 
          const result = await this.productModel.findByIdAndUpdate(
             _id,
             {
-               input,
+               ...input,
                productExpiryDate: expiryDate,
             },
             { new: true },
          );
 
+         console.log("input", input);
+         this.scheduleCouponCleanup(_id);
+
          return result;
       } catch (err) {
          throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATED_FAILED);
       }
+   }
+
+   private async checkExpiryDate(_id: string): Promise<void> {
+      try {
+         _id = shapeIntoMongooseObjectId(_id);
+         const product = await this.productModel.findById(_id);
+
+         const currentDate = new Date();
+
+         if (
+            product.productExpiryDate &&
+            isBefore(new Date(product.productExpiryDate), currentDate)
+         ) {
+            console.log("daewhfuhewiufhiu32funte====>", product);
+
+            await this.productModel.findByIdAndDelete(product).exec();
+         }
+         console.log("ewjnfjkwenf====>", product);
+      } catch (err) {
+         console.log("Error on checkExpiryDate", err);
+      }
+   }
+
+   private scheduleCouponCleanup(_id: string) {
+      const task = cron.schedule("*/1 * * * * *", async () => {
+         console.log("Running scheduled cleanup for expired products.");
+
+         await this.checkExpiryDate(_id);
+
+         const product = await this.productModel.findById(_id);
+         if (!product) {
+            console.log(
+               `Product with ID: ${_id} has been deleted. Stopping cleanup.`,
+            );
+            task.stop(); // Stop the cron job if the product is deleted
+         }
+      });
    }
 }
 export default ProductService;
