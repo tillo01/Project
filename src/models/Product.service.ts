@@ -203,7 +203,7 @@ class ProductService {
          );
 
          console.log("input", input);
-         this.scheduleCouponCleanup(_id);
+         this.deleteExpiredHours(_id);
 
          return result;
       } catch (err) {
@@ -222,17 +222,15 @@ class ProductService {
             product.productExpiryDate &&
             isBefore(new Date(product.productExpiryDate), currentDate)
          ) {
-            console.log("daewhfuhewiufhiu32funte====>", product);
-
             await this.productModel.findByIdAndDelete(product).exec();
          }
-         console.log("ewjnfjkwenf====>", product);
       } catch (err) {
          console.log("Error on checkExpiryDate", err);
+         throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATED_FAILED);
       }
    }
 
-   private scheduleCouponCleanup(_id: string) {
+   private deleteExpiredHours(_id: string) {
       const task = cron.schedule("0 * * * * *", async () => {
          console.log("Running scheduled cleanup for expired products.");
 
@@ -243,7 +241,7 @@ class ProductService {
             console.log(
                `Product with ID: ${_id} has been deleted. Stopping cleanup.`,
             );
-            task.stop(); // Stop the cron job if the product is deleted
+            task.stop();
          }
       });
    }
