@@ -33,6 +33,8 @@ export interface OrderItemInput {
    itemPrice: number;
    productId: ObjectId;
    orderId?: ObjectId;
+   productLeftCount: number;
+   productSold: number;
 }
 
 export interface OrderInquiry {

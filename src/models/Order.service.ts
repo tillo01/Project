@@ -16,15 +16,18 @@ import { ObjectId } from "mongoose";
 import { OrderStatus } from "../libs/enums/order.enum";
 import Errors from "../libs/types/Errors";
 import MemberService from "./Member.service";
+import ProductModel from "../schema/Product.model";
 class OrderService {
    private readonly orderModel;
    private readonly orderItemModel;
    private readonly memberService;
+   private readonly productModel;
 
    constructor() {
       this.orderModel = OrderModel;
       this.orderItemModel = OrderItemModel;
       this.memberService = new MemberService();
+      this.productModel = ProductModel;
    }
 
    public async createOrder(
@@ -66,6 +69,18 @@ class OrderService {
          item.orderId = orderId;
          item.productId = shapeIntoMongooseObjectId(item.productId);
          await this.orderItemModel.create(item);
+
+         await this.productModel.findOneAndUpdate(
+            { _id: item.productId },
+            {
+               $inc: {
+                  productSold: item.itemQuantity,
+                  productLeftCount: -item.itemQuantity,
+               },
+            },
+            { new: true },
+         );
+
          return "INSERTED ";
       });
       const orderItemsState = await Promise.all(promisedList);
@@ -115,6 +130,7 @@ class OrderService {
       const memberId = shapeIntoMongooseObjectId(member._id),
          orderId = shapeIntoMongooseObjectId(input.orderId),
          orderStatus = input.orderStatus;
+
       const result = await this.orderModel
          .findOneAndUpdate(
             { memberId: memberId, _id: orderId },
@@ -122,6 +138,7 @@ class OrderService {
             { new: true },
          )
          .exec();
+
       if (!result)
          throw new Errors(HttpCode.NOT_MODIFIED, Message.CREATE_FAILED);
       if (orderStatus === OrderStatus.PROCESS) {

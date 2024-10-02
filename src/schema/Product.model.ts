@@ -65,6 +65,11 @@ const productSchema = new Schema(
          type: Number,
          default: 0,
       },
+      productSold: {
+         type: Number,
+         default: 0,
+      },
+
       productExpiryDate: {
          type: Date,
          default: () => format(new Date(), "yyyy-MM-dd"),
