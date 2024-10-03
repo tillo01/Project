@@ -7,6 +7,7 @@ import {
    Member,
    MemberInput,
    MemberUpdateInput,
+   sendMessasgeInput,
 } from "../libs/types/member";
 import MemberService from "../models/Member.service";
 import Errors, { HttpCode, Message } from "../libs/types/Errors";
@@ -163,6 +164,24 @@ memberController.retriewAuth = async (
    } catch (err) {
       console.log("Error, on verifyAuth", err);
       next();
+   }
+};
+
+memberController.helpMessageHandler = async (req: Request, res: Response) => {
+   try {
+      const data: sendMessasgeInput = req.body;
+      console.log("Received send message request:", data);
+      if (!data.name || !data.email || !data.message || !data.subject) {
+         console.error("Validation failed:", data);
+         throw new Errors(HttpCode.BAD_RQUEST, Message.CREATE_FAILED);
+      }
+      const result = await memberService.helpMessageHandler(data);
+      console.log("Message sent successfully:", result);
+      res.status(HttpCode.OK).json(result);
+   } catch (err) {
+      console.log("sendMEssage", err);
+      if (err instanceof Errors) res.status(err.code).json(err);
+      else res.status(Errors.standard.code).json(Errors.standard);
    }
 };
 

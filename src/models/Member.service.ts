@@ -6,11 +6,17 @@ import {
    Member,
    MemberInput,
    MemberUpdateInput,
+   sendMessasgeInput,
 } from "../libs/types/member";
 import Errors, { HttpCode, Message } from "../libs/types/Errors";
 import { MemberStatus, MemberType } from "../libs/enums/member.enum";
+import nodemailer from "nodemailer";
 import * as bcrypt from "bcryptjs";
 import { shapeIntoMongooseObjectId } from "../libs/types/config";
+import { SentMessageInfo } from "nodemailer";
+import SMTPTransport from "nodemailer/lib/smtp-transport";
+
+require("dotenv").config();
 
 // CONTROLLER SHU YERGA JONATADI FURST VA KEGIN MODELDAN SCHEMA MODELGA KETADI
 
@@ -190,6 +196,44 @@ class MemberService {
       if (!result)
          throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATED_FAILED);
       return result;
+   }
+
+   public async helpMessageHandler(
+      input: sendMessasgeInput,
+   ): Promise<SentMessageInfo> {
+      console.log("Input received in sendMessage:", input);
+      const transporter = nodemailer.createTransport({
+         service: "gmail",
+
+         auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+         },
+         tls: {
+            rejectUnauthorized: false,
+         },
+      } as SMTPTransport.Options);
+      console.log("Using email:", process.env.EMAIL_USER);
+      console.log(
+         "Using password:",
+         process.env.EMAIL_PASS ? "****" : "Not Set",
+      );
+      const mailOptions = {
+         from: input.name,
+         to: process.env.EMAIL_USER,
+         subject: input.subject,
+         text: input.message,
+      };
+      console.log("Mail options:", mailOptions);
+      try {
+         console.log("Sending email to admin:", mailOptions);
+         await transporter.sendMail(mailOptions);
+         return { data: "ok" };
+      } catch (err) {
+         console.log("++", err);
+
+         throw new Errors(HttpCode.BAD_RQUEST, Message.CREATE_FAILED);
+      }
    }
 }
 // SSR end
