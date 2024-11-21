@@ -3,13 +3,13 @@
 import dotenv from "dotenv";
 dotenv.config();
 import mongoose from "mongoose";
-import app from "./app";
+import server from "./app";
 mongoose
    .connect(process.env.MONGO_URL as string, {})
    .then((data) => {
       console.log("Mongodb connection successed");
       const PORT = process.env.PORT ?? 3003;
-      app.listen(PORT, function () {
+      server.listen(PORT, function () {
          console.log(`The server is running successfully on port: ${PORT}`);
          console.log(`Admin Project on http://localhost:${PORT}/admin \n`);
       });
