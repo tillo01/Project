@@ -3,7 +3,7 @@
 module.exports = {
    apps: [
       {
-         name: "Chic-Aura",
+         name: "Cooking-Api",
          cwd: "./",
          script: "./dist/server.js",
          watch: false,

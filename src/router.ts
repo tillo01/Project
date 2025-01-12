@@ -5,8 +5,6 @@ const router = express.Router();
 import memberController from "./controller/member.controller";
 import uploader from "./libs/utils/uploader";
 import productController from "./controller/product.controller";
-import orderCotroller from "./controller/order.controller";
-import orderController from "./controller/order.controller";
 // Member
 router.get("/member/restaurant", memberController.getRestaurant);
 router.post("/member/signup", memberController.signup);
@@ -40,24 +38,6 @@ router.get(
 );
 
 // Order
-
-router.post(
-   "/order/create",
-   memberController.verifyAuth,
-   orderController.createOrder,
-);
-
-router.get(
-   "/order/all",
-   memberController.verifyAuth,
-   orderController.getMyOrders,
-);
-
-router.post(
-   "/order/update",
-   memberController.verifyAuth,
-   orderController.updateOrder,
-);
 
 router.post("/order/send-message", memberController.helpMessageHandler);
 
